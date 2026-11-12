@@ -188,7 +188,7 @@ class Scanner:
             while self._is_digit(self._peek()):
                 self._advance()
 
-        self._add_token(TokenType.NUMBER, self._source[self._start:self._current]) 
+        self._add_token(TokenType.NUMBER, float(self._source[self._start:self._current])) 
 
     def _is_at_end(self):
         
