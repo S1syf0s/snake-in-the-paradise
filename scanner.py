@@ -78,16 +78,16 @@ class Scanner:
                 self._add_token(TokenType.STAR)
             
             case '!':
-                self._add_token(BANG_EQUAL if self._match('=') else BANG)
+                self._add_token(TokenType.BANG_EQUAL if self._match('=') else TokenType.BANG)
 
             case '=':
-                self._add_token(EQUAL_EQUAL if self._match('=') else EQUAL)
+                self._add_token(TokenType.EQUAL_EQUAL if self._match('=') else TokenType.EQUAL)
 
             case '<':
-                self._add_token(LESS_EQUAL if self._match('=') else LESS)
+                self._add_token(TokenType.LESS_EQUAL if self._match('=') else TokenType.LESS)
 
             case '>':
-                self._add_token(GREATER_EQUAL if self._match('=') else GREATER)
+                self._add_token(TokenType.GREATER_EQUAL if self._match('=') else TokenType.GREATER)
 
             case '/':
                 
@@ -114,7 +114,25 @@ class Scanner:
                 self._string()
 
             case _:
-                __main__.Snake.error(self._line, "God is angry and Eve is hungry")
+                
+                if self._is_digit(c):
+                    self._number()
+
+                else:
+                    __main__.Snake.error(self._line, "God is angry and Eve is hungry")
+
+    def _number(self):
+        
+        while self._is_digit(self._peek()):
+            self._advance()
+        
+        if self._peek() == '.' and self._is_digit(self._peek_next()):
+            self._advance()
+            
+            while self._is_digit(self._peek()):
+                self._advance()
+
+        self._add_token(TokenType.NUMBER, self._source[self._start:self._current]) 
 
     def _is_at_end(self):
         
@@ -148,6 +166,15 @@ class Scanner:
             return '\0'
         
         return self._source[self._current]
+    
+    def _peek_next(self):
+        
+        if self._current + 1 >= len(self._source): 
+            return '\0'
 
+        return self._source[self._current + 1]
 
+    def _is_digit(self, c: str):
+        
+        return c >= '0' and c <= '9'
 
