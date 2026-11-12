@@ -12,7 +12,25 @@ class Scanner:
         self._start = 0
         self._current = 0
         self._line = 1
+        self._keywords = {}
     
+        self._keywords["and"] = TokenType.AND
+        self._keywords["class"] = TokenType.CLASS
+        self._keywords["else"] = TokenType.ELSE
+        self._keywords["false"] = TokenType.FALSE
+        self._keywords["for"] = TokenType.FOR
+        self._keywords["fun"] = TokenType.FUN
+        self._keywords["if"] = TokenType.IF
+        self._keywords["nil"] = TokenType.NIL
+        self._keywords["or"] = TokenType.OR
+        self._keywords["print"] = TokenType.PRINT
+        self._keywords["return"] = TokenType.RETURN
+        self._keywords["super"] = TokenType.SUPER
+        self._keywords["this"] = TokenType.THIS
+        self._keywords["true"] = TokenType.TRUE
+        self._keywords["var"] = TokenType.VAR
+        self._keywords["while"] = TokenType.WHILE
+
     def scan_tokens(self):
         
         while not self._is_at_end():
@@ -117,10 +135,26 @@ class Scanner:
                 
                 if self._is_digit(c):
                     self._number()
+                
+                elif self._is_alpha(c):
+                    self._identifier()
 
                 else:
                     __main__.Snake.error(self._line, "God is angry and Eve is hungry")
+    
+    def _identifier(self):
+        
+        while self._is_alpha_numeric(self._peek()):
+            self._advance()
+        
+        text = self._source[self._start:self._current]
+        
+        if text in self._keywords:
+            self._add_token(self._keywords[text])
+            return
 
+        self._add_token(TokenType.IDENTIFIER)
+            
     def _number(self):
         
         while self._is_digit(self._peek()):
@@ -171,9 +205,17 @@ class Scanner:
         
         if self._current + 1 >= len(self._source): 
             return '\0'
-
+    
         return self._source[self._current + 1]
+    
+    def _is_alpha_numeric(self, c: str):
 
+        return self._is_alpha(c) or self._is_digit(c)
+
+    def _is_alpha(self, c:str):
+
+        return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or c == '_'
+   
     def _is_digit(self, c: str):
         
         return c >= '0' and c <= '9'
