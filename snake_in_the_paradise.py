@@ -50,8 +50,10 @@ class Snake:
         
         scanner = Scanner(source)
         tokens = scanner.scan_tokens()
-        print(tokens)
-    
+        
+        for i in tokens:
+            print(i)
+
     @staticmethod
     def error(line: int, message: str):
         
@@ -66,6 +68,7 @@ class Snake:
 
 
 if __name__ == "__main__":
+
     Snake._main()
 
 
