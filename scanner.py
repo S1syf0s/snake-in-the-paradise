@@ -110,9 +110,31 @@ class Scanner:
             case '/':
                 
                 if self._match('/'):
+                    
                     while self._peek() != '\n' and not self._is_at_end():
                         self._advance()
                 
+                elif self._match('*'):
+                    
+                    closed = False
+
+                    while not self._is_at_end():
+                        
+                        if self._peek() == '*' and self._peek_next() == '/':
+                            self._advance()
+                            self._advance()
+                            closed = True
+                            break
+                        
+                        if self._peek() == '\n':
+                            self._line += 1
+
+                        self._advance()
+
+                    if not closed:
+
+                        __main__.Snake.error(self._line, "God is angry and Eve is hungry, close your comment")
+
                 else:
                     self._add_token(TokenType.SLASH)
             
