@@ -1,3 +1,5 @@
+from scanner import Scanner
+
 import sys
 
 class Snake:
@@ -65,6 +67,7 @@ class Snake:
         
         print(f"[line {line}] Error {where}: {message}")
         Snake._had_error = True
+
 
 
 if __name__ == "__main__":

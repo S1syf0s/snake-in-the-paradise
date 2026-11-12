@@ -1,6 +1,7 @@
 from token_type import TokenType
 from snake_token import Token
-from snake_in_the_paradise import Snake
+
+import __main__
 
 class Scanner:
     
@@ -22,6 +23,24 @@ class Scanner:
         self._tokens.append(Token(TokenType.EOF, "", None, self._line))
         return self._tokens
     
+    def _string(self):
+
+        while self._peek() != '"' and not self._is_at_end():
+
+            if self._peek() == '\n':
+                self._line += 1
+
+            self._advance()
+
+        if self._is_at_end():
+            __main__.Snake.error(self._line, "You took a bite, but please close the string")
+            return 
+
+        self._advance()
+        
+        value = self._source[self._start + 1:self._current - 1]
+        self._add_token(TokenType.STRING, value)
+
     def _scan_token(self):
         
         c = self._advance()
@@ -72,18 +91,31 @@ class Scanner:
 
             case '/':
                 
-                if match('/'):
-                    while peek() != '\n' and !self._is_at_end():
-                        self._advande()
+                if self._match('/'):
+                    while self._peek() != '\n' and not self._is_at_end():
+                        self._advance()
                 
                 else:
-                    self._add_token(SLASH)
+                    self._add_token(TokenType.SLASH)
+            
+            case ' ':
+                pass
 
+            case '\r':
+                pass
 
+            case '\t':
+                pass
+
+            case '\n':
+                self._line += 1
+
+            case '"':
+                self._string()
 
             case _:
-                Snake.error(line, "Unexpected apple")
-       
+                __main__.Snake.error(self._line, "God is angry and Eve is hungry")
+
     def _is_at_end(self):
         
         return self._current >= len(self._source) 
@@ -107,12 +139,12 @@ class Scanner:
         if (self._source[self._current] != expected):
             return False
         
-        current++
+        self._current += 1
         return True
     
     def _peek(self):
 
-        if self._is_at_end:
+        if self._is_at_end():
             return '\0'
         
         return self._source[self._current]
