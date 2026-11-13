@@ -1,63 +1,25 @@
+from dataclasses import dataclass
+from token import Token
+
 class Expr:
+    pass
 
-    class Visitor:
-
-        def visit_binary_expr(self, expr):
-            raise NotImplementedError
-
-        def visit_grouping_expr(self, expr):
-            raise NotImplementedError
-
-        def visit_literal_expr(self, expr):
-            raise NotImplementedError
-
-        def visit_unary_expr(self, expr):
-            raise NotImplementedError
-
+@dataclass
 class Binary(Expr):
+    left: Expr
+    operator: Token
+    right: Expr
 
-    def __init__(self, left, operator, right):
-
-        self.left = left
-        self.operator = operator
-        self.right = right
-
-
-    def accept(self, visitor):
-
-        return visitor.visit_binary_expr(self)
-
+@dataclass
 class Grouping(Expr):
+    expression: Expr
 
-    def __init__(self, expression):
-
-        self.expression = expression
-
-
-    def accept(self, visitor):
-
-        return visitor.visit_grouping_expr(self)
-
+@dataclass
 class Literal(Expr):
+    value: object
 
-    def __init__(self, value):
-
-        self.value = value
-
-
-    def accept(self, visitor):
-
-        return visitor.visit_literal_expr(self)
-
+@dataclass
 class Unary(Expr):
-
-    def __init__(self, operator, right):
-
-        self.operator = operator
-        self.right = right
-
-
-    def accept(self, visitor):
-
-        return visitor.visit_unary_expr(self)
+    operator: Token
+    right: Expr
 

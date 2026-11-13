@@ -12,10 +12,10 @@ class GenerateAst:
         output_dir = args[0]
 
         GenerateAst._define_ast(output_dir, "Expr", [
-            "Binary    : left, operator, right",
-            "Grouping  : expression",
-            "Literal   : value",
-            "Unary     : operator, right"
+            "Binary    : Expr left, Token operator, Expr right",
+            "Grouping  : Expr expression",
+            "Literal   : object value",
+            "Unary     : Token operator, Expr right"
         ])
         
     @staticmethod
@@ -24,10 +24,12 @@ class GenerateAst:
         path = output_dir + "/" + base_name.lower() + ".py"
         
         with open(path, "w", encoding="utf-8") as writer:
+            
+            writer.write("from dataclasses import dataclass\n")
+            writer.write("from snake_token import Token\n\n")
 
-            writer.write(f"class {base_name}:\n\n")
-
-            GenerateAst._define_visitor(writer, base_name, types)
+            writer.write(f"class {base_name}:\n")
+            writer.write("    pass\n\n")
 
             for type_def in types:
                 class_name = type_def.split(":")[0].strip()
@@ -35,33 +37,18 @@ class GenerateAst:
                 GenerateAst._define_type(writer, base_name, class_name, fields)
 
     @staticmethod
-    def _define_visitor(writer, base_name: str, types: list[str]):
-        
-        writer.write("    class Visitor:\n\n")
-
-        for type_def in types:
-            type_name = type_def.split(":")[0].strip()
-            method = f"        def visit_{type_name.lower()}_{base_name.lower()}(self, expr):\n"
-            
-            writer.write(method)
-            writer.write(f"            raise NotImplementedError\n\n")
-
-    @staticmethod
     def _define_type(writer, base_name: str, class_name: str, field_list: str):
         
-        writer.write(f"class {class_name}({base_name}):\n\n")
-        
-        writer.write(f"    def __init__(self, {field_list}):\n\n")
+        writer.write("@dataclass\n")
+        writer.write(f"class {class_name}({base_name}):\n")
         
         fields = field_list.split(", ")
       
         for field in fields:
-            writer.write(f"        self.{field} = {field}\n")
+            field = field.split(" ")
+            writer.write(f"    {field[1]}: {field[0]}\n")
                 
         writer.write("\n")
-
-        writer.write("    def accept(self, visitor):\n\n")
-        writer.write(f"        return visitor.visit_{class_name.lower()}_{base_name.lower()}(self)\n\n")
 
 if __name__== "__main__":
     
