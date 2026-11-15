@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from token import Token
+from snake_token import Token
 
 class Expr:
     pass
