@@ -1,0 +1,171 @@
+from expr import Expr, Binary, Conditional, Unary, Literal, Grouping
+from snake_token import Token
+from token_type import TokenType
+from runtime_error import RunTimeError
+
+import __main__
+
+class Interpreter:
+    
+    def interpret(self, expression):
+
+        try:
+            value = self.evaluate(expression)
+            print(self._stringify(value))
+
+        except RunTimeError as error:
+            __main__.Snake.runtime_error(error)
+
+    def evaluate(self, expr: Expr):
+
+        match expr:
+
+            case Literal(value):
+
+                return value
+            
+            case Grouping(expression):
+
+                return self.evaluate(expression)
+            
+            case Unary(operator, right):
+                
+                right = self.evaluate(right)
+            
+                match operator.token_type:
+
+                    case TokenType.MINUS:
+                        
+                        self._check_number_operand(operator, right)
+                        return -(float(right))
+                    
+                    case TokenType.BANG:
+                         
+                        return not self._is_truthy(right)
+
+            case Binary(left, operator, right):
+                
+                left = self.evaluate(left)
+                right = self.evaluate(right)
+
+                match operator.token_type:
+                    
+                    case TokenType.GREATER:
+                        
+                        self._check_number_operands(operator, left, right)
+                        return float(left) > float(right)
+
+                    case TokenType.GREATER_EQUAL:
+                        
+                        self._check_number_operands(operator, left, right)
+                        return float(left) >= float(right)
+                    
+                    case TokenType.LESS:
+
+                        self._check_number_operands(operator, left, right)
+                        return float(left) < float(right)
+
+                    case TokenType.LESS_EQUAL:
+
+                        self._check_number_operands(operator, left, right)
+                        return float(left) <= float(right)
+                    
+                    case TokenType.BANG_EQUAL:
+
+                        return not self._is_equal(left, right) 
+
+                    case TokenType.EQUAL_EQUAL:
+
+                        return self._is_equal(left, right)
+
+                    case TokenType.MINUS:
+
+                        self._check_number_operands(operator, left, right)
+                        return float(left) - float(right)
+
+                    case TokenType.PLUS:
+
+                        if isinstance(left, float) and isinstance(right, float):
+                            
+                            return float(left) + float(right)
+
+                        if isinstance(left, str) and isinstance(right, str):
+
+                            return str(left) + str(right)
+                            
+                        raise RunTimeError(operator, "Operands must be two numbers or two strings")
+
+                    case TokenType.SLASH:
+
+                        self._check_number_operands(operator, left, right)
+                        return float(left) / float(right)
+
+                    case TokenType.STAR:
+
+                        self._check_number_operands(operator, left, right)
+                        return float(left) * float(right)
+                    
+
+                return None
+
+    def _is_truthy(self, value: object):
+
+        if value is None:
+
+            return False
+
+        if isinstance(value, bool):
+
+            return value
+
+        return True
+    
+    def _is_equal(self, left: object, right: object):
+
+        if left is None and right is None:
+
+            return True
+        
+        if left is None:
+
+            return False
+        
+        return left == right
+    
+    def _check_number_operand(self, operator: Token, operand: object):
+
+        if isinstance(operand, float):
+
+            return
+
+        raise RunTimeError(operator, "Operand must be a number")
+
+    def _check_number_operands(self, operator: Token, left: object, right: object):
+
+        if isinstance(left, float) and isinstance(right, float):
+
+            return
+
+        raise RunTimeError(operator, "Operands must be numbers")
+    
+    def _stringify(self, obj: object):
+
+        if obj == None:
+            return "nil"
+        
+        if isinstance(obj, bool):
+
+            return str(obj).lower()
+
+        if isinstance(obj, float):
+            
+            text = str(obj)
+            
+            if text.endswith("0"):
+                text = text[:-2]
+            
+            return text 
+
+        return str(obj)
+
+

@@ -3,12 +3,16 @@ from snake_token import Token
 from token_type import TokenType
 from ast_printer import AstPrinter
 from parser import Parser
+from runtime_error import RunTimeError
+from interpreter import Interpreter
 
 import sys
 
 class Snake:
-    
+   
+    _interpreter = Interpreter()
     _had_error = False
+    _had_runtime_error = False 
 
     @staticmethod
     def _main():
@@ -27,7 +31,7 @@ class Snake:
     
     @staticmethod
     def _runFile(path: str):
-        
+         
         file = open(path, "r")
         source = file.read()
         file.close()
@@ -35,6 +39,9 @@ class Snake:
         
         if (Snake._had_error):
             sys.exit(65)
+
+        if (Snake._had_runtime_error):
+            sys.exit(70)
     
     @staticmethod
     def _runPrompt():
@@ -60,9 +67,9 @@ class Snake:
         expression = parser.parse()
 
         if Snake._had_error:
-            return
+            return 
 
-        print(AstPrinter().print_expr(expression))
+        Snake._interpreter.interpret(expression) 
 
     @staticmethod
     def error(token: Token, message: str):
@@ -80,7 +87,12 @@ class Snake:
         else:
             
             Snake._report(token, "", message)
-
+    
+    @staticmethod
+    def runtime_error(error: RunTimeError):
+        
+        print(f"{error}\n[line {error.token.line}]", file=sys.stderr)
+        Snake._had_runtime_error = True        
 
     @staticmethod
     def _report(line: int, where: str, message: str):
