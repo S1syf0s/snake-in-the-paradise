@@ -1,4 +1,4 @@
-from expr import Expr, Binary, Unary, Literal, Grouping
+from expr import Expr, Binary, Conditional, Unary, Literal, Grouping
 from snake_token import Token
 from token_type import TokenType
 
@@ -14,6 +14,10 @@ class AstPrinter:
                     return "nil"
 
                 return str(value)
+           
+            case Conditional(condition, then_branch, else_branch):
+
+                return self._parenthesize("?:", condition, then_branch, else_branch)
 
             case Grouping(expression):
                 
@@ -26,7 +30,7 @@ class AstPrinter:
             case Binary(left, operator, right):
 
                 return self._parenthesize(operator.lexeme, left, right)
-        
+
     def _parenthesize(self, name: str, *exprs: Expr):
 
         result = "(" + name

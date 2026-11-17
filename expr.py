@@ -19,6 +19,12 @@ class Literal(Expr):
     value: object
 
 @dataclass
+class Conditional(Expr):
+    condition: Expr
+    then_branch: Expr
+    else_branch: Expr
+
+@dataclass
 class Unary(Expr):
     operator: Token
     right: Expr

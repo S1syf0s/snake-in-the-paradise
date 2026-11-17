@@ -1,4 +1,4 @@
-from expr import Expr, Binary, Unary, Literal, Grouping
+from expr import Expr, Binary, Conditional, Unary, Literal, Grouping
 from snake_token import Token
 from token_type import TokenType
 
@@ -24,15 +24,33 @@ class Parser:
 
     def _expression(self):
 
-        expr = self._equality()
+        expr = self._conditional()
 
         while (self._match(TokenType.COMMA)):
 
             operator = self._previous()
-            right = self._equality()
+            right = self._conditional()
 
             expr = Binary(expr, operator, right)
          
+        return expr
+
+    def _conditional(self):
+        
+        expr = self._equality()
+
+        if self._match(TokenType.QUESTION):
+            
+            condition = expr
+            
+            then_branch = self._equality()
+
+            if self._consume(TokenType.COLON, "expected ':' after branch"):
+
+                else_branch = self._conditional()
+
+            expr = Conditional(condition, then_branch, else_branch)
+
         return expr
 
     def _equality(self):
@@ -203,8 +221,5 @@ class Parser:
                     return
 
             self._advance()
-
-
-
 
 

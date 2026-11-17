@@ -95,6 +95,12 @@ class Scanner:
             case '*':
                 self._add_token(TokenType.STAR)
             
+            case '?':
+                self._add_token(TokenType.QUESTION)
+
+            case ':':
+                self._add_token(TokenType.COLON)
+
             case '!':
                 self._add_token(TokenType.BANG_EQUAL if self._match('=') else TokenType.BANG)
 

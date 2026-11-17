@@ -12,10 +12,11 @@ class GenerateAst:
         output_dir = args[0]
 
         GenerateAst._define_ast(output_dir, "Expr", [
-            "Binary    : Expr left, Token operator, Expr right",
-            "Grouping  : Expr expression",
-            "Literal   : object value",
-            "Unary     : Token operator, Expr right"
+            "Binary      : Expr left, Token operator, Expr right",
+            "Grouping    : Expr expression",
+            "Literal     : object value",
+            "Conditional : Expr condition, Expr then_branch, Expr else_branch",
+            "Unary       : Token operator, Expr right"
         ])
         
     @staticmethod
