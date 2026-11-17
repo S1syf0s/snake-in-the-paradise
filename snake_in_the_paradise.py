@@ -1,4 +1,8 @@
 from scanner import Scanner
+from snake_token import Token
+from token_type import TokenType
+from ast_printer import AstPrinter
+from parser import Parser
 
 import sys
 
@@ -52,14 +56,30 @@ class Snake:
         
         scanner = Scanner(source)
         tokens = scanner.scan_tokens()
-        
-        for i in tokens:
-            print(i)
+        parser = Parser(tokens)
+        expression = parser.parse()
+
+        if Snake._had_error:
+            return
+
+        print(AstPrinter().print_expr(expression))
 
     @staticmethod
-    def error(line: int, message: str):
+    def error(token: Token, message: str):
         
-        Snake._report(line, "", message)
+        if isinstance(token, Token):
+
+            if token.token_type == TokenType.EOF:
+
+                Snake._report(token.line, " at end", message)
+
+            else:
+
+                Snake._report(token.line, f" at '{token.lexeme}'", message)
+
+        else:
+            
+            Snake._report(token, "", message)
 
 
     @staticmethod
@@ -67,8 +87,6 @@ class Snake:
         
         print(f"[line {line}] Error {where}: {message}")
         Snake._had_error = True
-
-
 
 if __name__ == "__main__":
 
