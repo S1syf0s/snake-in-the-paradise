@@ -96,15 +96,37 @@ class Interpreter:
                         return float(left) - float(right)
 
                     case TokenType.PLUS:
-
+                        
                         if isinstance(left, float) and isinstance(right, float):
                             
                             return float(left) + float(right)
 
                         if isinstance(left, str) and isinstance(right, str):
 
-                            return str(left) + str(right)
+                            return left + right
+                        
+                        if isinstance(left, str) and isinstance(right, float):
+
+                            string = left + str(right)
                             
+                            if string.endswith("0"):
+
+                                return string[:-2]
+                            
+                            return string
+
+                        if isinstance(left, float) and isinstance(right, str):
+                            
+                            left_string = str(left)
+
+                            if left_string.endswith("0"):
+
+                                left_string = left_string[:-2]
+
+                            string = left_string + right
+                            
+                            return string
+
                         raise RunTimeError(operator, "Operands must be two numbers or two strings")
 
                     case TokenType.SLASH:
@@ -117,7 +139,6 @@ class Interpreter:
                         self._check_number_operands(operator, left, right)
                         return float(left) * float(right)
                     
-
                 return None
 
     def _is_truthy(self, value: object):
