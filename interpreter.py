@@ -132,6 +132,11 @@ class Interpreter:
                     case TokenType.SLASH:
 
                         self._check_number_operands(operator, left, right)
+                        
+                        if right == 0:
+
+                            raise RunTimeError(operator, "Division by zero")
+
                         return float(left) / float(right)
 
                     case TokenType.STAR:
