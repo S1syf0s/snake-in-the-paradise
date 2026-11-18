@@ -43,7 +43,7 @@ class Parser:
             
             condition = expr
             
-            then_branch = self._equality()
+            then_branch = self._expression()
 
             if self._consume(TokenType.COLON, "expected ':' after branch"):
 
@@ -89,11 +89,11 @@ class Parser:
             expr = Binary(expr, operator, right)
 
         return expr
-    
+
     def _factor(self):
 
         expr = self._unary()
-        
+
         while (self._match(TokenType.SLASH, TokenType.STAR)):
 
             operator = self._previous()
@@ -221,5 +221,4 @@ class Parser:
                     return
 
             self._advance()
-
 

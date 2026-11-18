@@ -24,6 +24,18 @@ class Interpreter:
 
                 return value
             
+            case Conditional(condition, then_branch, else_branch):
+
+                condition = self.evaluate(condition)
+                
+                if condition == True:
+                    
+                    return self.evaluate(then_branch)
+                
+                else:
+
+                    return self.evaluate(else_branch)
+
             case Grouping(expression):
 
                 return self.evaluate(expression)
