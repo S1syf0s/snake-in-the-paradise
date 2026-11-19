@@ -1,4 +1,4 @@
-from expr import Expr, Binary, Conditional, Unary, Variable, Literal, Grouping
+from expr import Expr, Binary, Assing, Conditional, Unary, Variable, Literal, Grouping
 from snake_token import Token
 from token_type import TokenType
 from stmt import Stmt, Print, Expression, Var
@@ -27,12 +27,12 @@ class Parser:
 
     def _expression(self):
 
-        expr = self._conditional()
+        expr = self._assignment()
 
         while (self._match(TokenType.COMMA)):
 
             operator = self._previous()
-            right = self._conditional()
+            right = self._assignment()
 
             expr = Binary(expr, operator, right)
          
@@ -88,6 +88,24 @@ class Parser:
         self._consume(TokenType.SEMICOLON, "Expect ';' after expression")
 
         return Expression(expr)
+
+    def _assignment(self):
+
+        expr = self._equality()
+        
+        if self._match(TokenType.EQUAL):
+
+            equals = self._previous()
+            value = self._assignment()
+
+            if isinstance(expr, Variable):
+
+                name = expr.name
+                return Assing(name, value)
+            
+            self._error(equals, "Invalid assignment target")
+
+        return expr
 
     def _conditional(self):
         

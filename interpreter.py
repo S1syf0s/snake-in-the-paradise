@@ -1,4 +1,4 @@
-from expr import Expr, Binary, Conditional, Variable, Unary, Literal, Grouping
+from expr import Expr, Binary, Assing, Variable, Conditional, Unary, Literal, Grouping
 from snake_token import Token
 from token_type import TokenType
 from runtime_error import RunTimeError
@@ -65,8 +65,20 @@ class Interpreter:
 
                 return self._environment.get(name)
 
+            case Assing(name, value):
+
+                value = self.evaluate(value)
+                
+                self._environment.assign(name, value)
+                return value
+
             case Binary(left, operator, right):
                 
+                if operator.token_type == TokenType.COMMA:
+
+                    self.evaluate(left)
+                    return self.evaluate(right)
+
                 left = self.evaluate(left)
                 right = self.evaluate(right)
 

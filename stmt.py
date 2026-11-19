@@ -5,6 +5,10 @@ class Stmt:
     pass
 
 @dataclass
+class Block(Stmt):
+    statements: list[Stmt]
+
+@dataclass
 class Expression(Stmt):
     expression: Expr
 
@@ -16,4 +20,5 @@ class Print(Stmt):
 class Var(Stmt):
     name: Token
     initializer: Expr
+
 
