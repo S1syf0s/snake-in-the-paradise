@@ -5,7 +5,7 @@ class Environment:
     def __init__(self, enclosing=None):
         
         self._values = {}
-        self.enclosing = enclosing
+        self._enclosing = enclosing
 
     def get(self, name: object):
 
@@ -15,7 +15,7 @@ class Environment:
         
         if self._enclosing is not None:
             
-            return enclosing.get(name)
+            return self._enclosing.get(name)
 
         raise RunTimeError(name, f"Undefined variable '{name.lexeme}'")
     
@@ -26,9 +26,9 @@ class Environment:
             self._values[name.lexeme] = value
             return
         
-        if self.enclosing is not None:
+        if self._enclosing is not None:
 
-            enclosing.assign(name, value)
+            self._enclosing.assign(name, value)
             return
 
         raise RunTimeError(name, f"Undefined variable '{name.lexeme}'")

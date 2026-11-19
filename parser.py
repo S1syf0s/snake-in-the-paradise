@@ -1,7 +1,7 @@
 from expr import Expr, Binary, Assing, Conditional, Unary, Variable, Literal, Grouping
 from snake_token import Token
 from token_type import TokenType
-from stmt import Stmt, Print, Expression, Var
+from stmt import Stmt, Print, Expression, Var, Block
 
 import __main__
 
@@ -57,6 +57,10 @@ class Parser:
         if self._match(TokenType.PRINT):
 
             return self._print_statement()
+        
+        if self._match(TokenType.LEFT_BRACE):
+
+            return Block(self._block())
 
         return self._expression_statement()
     
@@ -67,7 +71,7 @@ class Parser:
         self._consume(TokenType.SEMICOLON, "Expect ';' after value")
 
         return Print(value)
-    
+
     def _var_declaration(self):
         
         name = self._consume(TokenType.IDENTIFIER, "Expect variable name")
@@ -88,6 +92,17 @@ class Parser:
         self._consume(TokenType.SEMICOLON, "Expect ';' after expression")
 
         return Expression(expr)
+
+    def _block(self):
+
+        statements = []
+
+        while not self._check(TokenType.RIGHT_BRACE) and not self._is_at_end():
+
+            statements.append(self._declaration())
+
+        self._consume(TokenType.RIGHT_BRACE, "Expect '}' after block")
+        return statements
 
     def _assignment(self):
 

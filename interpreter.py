@@ -2,7 +2,7 @@ from expr import Expr, Binary, Assing, Variable, Conditional, Unary, Literal, Gr
 from snake_token import Token
 from token_type import TokenType
 from runtime_error import RunTimeError
-from stmt import Stmt, Print, Expression, Var
+from stmt import Stmt, Print, Expression, Var, Block
 from environment import Environment
 
 import __main__
@@ -192,6 +192,25 @@ class Interpreter:
                 self._environment.define(name.lexeme, value)
                 
                 return None
+
+            case Block(statements):
+
+                self.execute_block(statements, Environment(self._environment))
+                return None
+     
+    def execute_block(self, statements, environment):
+
+        previous = self._environment
+
+        try:
+            self._environment = environment
+
+            for statement in statements:
+
+                self._execute(statement)
+                
+        finally:
+            self._environment = previous
 
     def _is_truthy(self, value: object):
 

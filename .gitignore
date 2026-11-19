@@ -5,3 +5,7 @@ __pycache__/
 # Txt
 
 *.txt
+
+# Test files
+
+*.lox
