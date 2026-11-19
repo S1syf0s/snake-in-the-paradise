@@ -1,6 +1,7 @@
-from expr import Expr, Binary, Conditional, Unary, Literal, Grouping
+from expr import Expr, Binary, Conditional, Unary, Variable, Literal, Grouping
 from snake_token import Token
 from token_type import TokenType
+from stmt import Stmt, Print, Expression, Var
 
 import __main__
 
@@ -15,12 +16,14 @@ class Parser:
         self._current = 0
 
     def parse(self):
-
-        try:
-            return self._expression()
         
-        except ParseError as error:
-            return None
+        statements = []
+
+        while not self._is_at_end():
+
+            statements.append(self._declaration())
+
+        return statements
 
     def _expression(self):
 
@@ -34,6 +37,57 @@ class Parser:
             expr = Binary(expr, operator, right)
          
         return expr
+    
+    def _declaration(self):
+
+        try:
+            if self._match(TokenType.VAR):
+
+                return self._var_declaration()
+            
+            return self._statement()
+        
+        except ParseError as error:
+            
+            self._synchronize()
+            return None
+
+    def _statement(self):
+
+        if self._match(TokenType.PRINT):
+
+            return self._print_statement()
+
+        return self._expression_statement()
+    
+    def _print_statement(self):
+        
+        value = self._expression()
+
+        self._consume(TokenType.SEMICOLON, "Expect ';' after value")
+
+        return Print(value)
+    
+    def _var_declaration(self):
+        
+        name = self._consume(TokenType.IDENTIFIER, "Expect variable name")
+        
+        initializer = None
+
+        if self._match(TokenType.EQUAL):
+
+            initializer = self._expression()
+
+        self._consume(TokenType.SEMICOLON, "Expect ';' after variable declaration")
+        return Var(name, initializer)
+
+    def _expression_statement(self):
+
+        expr = self._expression()
+
+        self._consume(TokenType.SEMICOLON, "Expect ';' after expression")
+
+        return Expression(expr)
 
     def _conditional(self):
         
@@ -129,6 +183,10 @@ class Parser:
         if self._match(TokenType.NUMBER, TokenType.STRING):
 
             return Literal(self._previous().literal)
+
+        if self._match(TokenType.IDENTIFIER):
+
+            return Variable(self._previous())
 
         if self._match(TokenType.LEFT_PAREN):
 

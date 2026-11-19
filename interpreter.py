@@ -1,17 +1,23 @@
-from expr import Expr, Binary, Conditional, Unary, Literal, Grouping
+from expr import Expr, Binary, Conditional, Variable, Unary, Literal, Grouping
 from snake_token import Token
 from token_type import TokenType
 from runtime_error import RunTimeError
+from stmt import Stmt, Print, Expression, Var
+from environment import Environment
 
 import __main__
 
 class Interpreter:
     
-    def interpret(self, expression):
+    def __init__(self):
+
+        self._environment = Environment()
+
+    def interpret(self, statements: list[Stmt]):
 
         try:
-            value = self.evaluate(expression)
-            print(self._stringify(value))
+            for statement in statements:
+                self._execute(statement)
 
         except RunTimeError as error:
             __main__.Snake.runtime_error(error)
@@ -54,6 +60,10 @@ class Interpreter:
                     case TokenType.BANG:
                          
                         return not self._is_truthy(right)
+            
+            case Variable(name):
+
+                return self._environment.get(name)
 
             case Binary(left, operator, right):
                 
@@ -144,6 +154,31 @@ class Interpreter:
                         self._check_number_operands(operator, left, right)
                         return float(left) * float(right)
                     
+                return None
+    
+    def _execute(self, stmt: Stmt):
+
+        match stmt:
+
+            case Expression(expression):
+
+                self.evaluate(expression)
+
+            case Print(expression):
+                
+                value = self.evaluate(expression)
+                print(self._stringify(value))
+
+            case Var(name, initializer):
+                
+                value = None
+
+                if initializer is not None:
+                    
+                    value = self.evaluate(initializer)
+                
+                self._environment.define(name.lexeme, value)
+                
                 return None
 
     def _is_truthy(self, value: object):

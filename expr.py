@@ -5,6 +5,11 @@ class Expr:
     pass
 
 @dataclass
+class Assing(Expr):
+    name: Token
+    value: Expr
+
+@dataclass
 class Binary(Expr):
     left: Expr
     operator: Token
@@ -28,4 +33,8 @@ class Conditional(Expr):
 class Unary(Expr):
     operator: Token
     right: Expr
+
+@dataclass
+class Variable(Expr):
+    name: Token
 

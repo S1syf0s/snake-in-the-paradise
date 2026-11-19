@@ -64,12 +64,12 @@ class Snake:
         scanner = Scanner(source)
         tokens = scanner.scan_tokens()
         parser = Parser(tokens)
-        expression = parser.parse()
+        statements = parser.parse()
 
         if Snake._had_error:
             return 
 
-        Snake._interpreter.interpret(expression) 
+        Snake._interpreter.interpret(statements) 
 
     @staticmethod
     def error(token: Token, message: str):
