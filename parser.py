@@ -1,7 +1,7 @@
 from expr import Expr, Binary, Assing, Conditional, Unary, Variable, Literal, Grouping
 from snake_token import Token
 from token_type import TokenType
-from stmt import Stmt, Print, Expression, Var, Block
+from stmt import Stmt, Print, If, Expression, Var, Block
 
 import __main__
 
@@ -53,6 +53,10 @@ class Parser:
             return None
 
     def _statement(self):
+        
+        if self._match(TokenType.IF):
+
+            return self._if_statement()
 
         if self._match(TokenType.PRINT):
 
@@ -63,7 +67,24 @@ class Parser:
             return Block(self._block())
 
         return self._expression_statement()
-    
+
+    def _if_statement(self):
+
+        self._consume(TokenType.LEFT_PAREN, "Expect '(' after if")
+
+        condition = self._expression()
+
+        self._consume(TokenType.RIGHT_PAREN, "Expect ')' after if")
+
+        then_branch = self._statement()
+        else_branch = None
+
+        if self._match(TokenType.ELSE):
+
+            else_branch = self._statement()
+        
+        return If(condition, then_branch, else_branch)
+
     def _print_statement(self):
         
         value = self._expression()
@@ -106,7 +127,7 @@ class Parser:
 
     def _assignment(self):
 
-        expr = self._equality()
+        expr = self._conditional()
         
         if self._match(TokenType.EQUAL):
 

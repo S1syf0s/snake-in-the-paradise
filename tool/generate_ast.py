@@ -24,6 +24,7 @@ class GenerateAst:
         GenerateAst._define_ast(output_dir, "Stmt", [
             "Block       : list[Stmt] statements",
             "Expression  : Expr expression",
+            "If          : Expr condition, Stmt then_branch, Stmt else_branch",
             "Print       : Expr expression",
             "Var         : Token name, Expr initializer"
         ])

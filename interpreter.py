@@ -2,7 +2,7 @@ from expr import Expr, Binary, Assing, Variable, Conditional, Unary, Literal, Gr
 from snake_token import Token
 from token_type import TokenType
 from runtime_error import RunTimeError
-from stmt import Stmt, Print, Expression, Var, Block
+from stmt import Stmt, Print, If, Expression, Var, Block
 from environment import Environment
 
 import __main__
@@ -17,7 +17,14 @@ class Interpreter:
 
         try:
             for statement in statements:
-                self._execute(statement)
+                
+                if isinstance(statement, Expression):
+
+                    value = self.evaluate(statement.expression)
+                    print(self._stringify(value))
+
+                else:
+                    self._execute(statement)
 
         except RunTimeError as error:
             __main__.Snake.runtime_error(error)
@@ -197,7 +204,19 @@ class Interpreter:
 
                 self.execute_block(statements, Environment(self._environment))
                 return None
-     
+            
+            case If(condition, then_branch, else_branch):
+
+                if self._is_truthy(self.evaluate(condition)):
+                    
+                    self._execute(then_branch)
+
+                elif else_branch is not None:
+
+                    self._execute(else_branch)
+
+                return None
+
     def execute_block(self, statements, environment):
 
         previous = self._environment
