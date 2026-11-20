@@ -20,7 +20,7 @@ class Parser:
         statements = []
 
         while not self._is_at_end():
-
+            
             statements.append(self._declaration())
 
         return statements
@@ -39,7 +39,7 @@ class Parser:
         return expr
     
     def _declaration(self):
-
+        
         try:
             if self._match(TokenType.VAR):
 

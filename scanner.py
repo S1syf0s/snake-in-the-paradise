@@ -181,7 +181,7 @@ class Scanner:
             self._add_token(self._keywords[text])
             return
 
-        self._add_token(TokenType.IDENTIFIER, text)
+        self._add_token(TokenType.IDENTIFIER)
             
     def _number(self):
         

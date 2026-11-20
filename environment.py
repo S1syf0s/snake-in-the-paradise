@@ -11,6 +11,10 @@ class Environment:
 
         if name.lexeme in self._values:
             
+            if self._values[name.lexeme] is None:
+
+                raise RunTimeError(name, f"Trying to access uninitialized variable '{name.lexeme}'")
+
             return self._values[name.lexeme]
         
         if self._enclosing is not None:
@@ -38,5 +42,7 @@ class Environment:
 
         self._values[name] = value
 
-    
+
+
+
 

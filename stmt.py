@@ -21,4 +21,3 @@ class Var(Stmt):
     name: Token
     initializer: Expr
 
-
