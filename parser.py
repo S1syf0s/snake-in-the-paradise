@@ -1,7 +1,7 @@
-from expr import Expr, Binary, Assing, Conditional, Unary, Variable, Literal, Grouping
+from expr import *
 from snake_token import Token
 from token_type import TokenType
-from stmt import Stmt, Print, If, Expression, Var, Block
+from stmt import *
 
 import __main__
 
@@ -59,9 +59,13 @@ class Parser:
             return self._if_statement()
 
         if self._match(TokenType.PRINT):
-
-            return self._print_statement()
         
+            return self._print_statement()
+
+        if self._match(TokenType.WHILE):
+
+            return self._while_statement()
+
         if self._match(TokenType.LEFT_BRACE):
 
             return Block(self._block())
@@ -105,6 +109,18 @@ class Parser:
 
         self._consume(TokenType.SEMICOLON, "Expect ';' after variable declaration")
         return Var(name, initializer)
+    
+    def _while_statement(self):
+
+        self._consume(TokenType.LEFT_PAREN, "Expect '(' afrer 'while'")
+
+        condition = self._expression()
+
+        self._consume(TokenType.RIGHT_PAREN, "Expect ')' after condition")
+
+        body = self._statement()
+
+        return While(condition, body)
 
     def _expression_statement(self):
 
@@ -145,7 +161,7 @@ class Parser:
 
     def _conditional(self):
         
-        expr = self._equality()
+        expr = self._or()
 
         if self._match(TokenType.QUESTION):
             
@@ -158,6 +174,30 @@ class Parser:
                 else_branch = self._conditional()
 
             expr = Conditional(condition, then_branch, else_branch)
+
+        return expr
+    
+    def _or(self):
+
+        expr = self._and()
+
+        while self._match(TokenType.OR):
+
+            operator = self._previous()
+            right = self._and()
+            expr = Logical(expr, operator, right)
+
+        return expr
+
+    def _and(self):
+
+        expr = self._equality()
+
+        while self._match(TokenType.AND):
+
+            operator = self._previous()
+            right = self._equality()
+            expr = Logical(expr, operator, right)
 
         return expr
 

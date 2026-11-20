@@ -1,8 +1,8 @@
-from expr import Expr, Binary, Assing, Variable, Conditional, Unary, Literal, Grouping
+from expr import *
 from snake_token import Token
 from token_type import TokenType
 from runtime_error import RunTimeError
-from stmt import Stmt, Print, If, Expression, Var, Block
+from stmt import *
 from environment import Environment
 
 import __main__
@@ -37,6 +37,24 @@ class Interpreter:
 
                 return value
             
+            case Logical(left, operator, right):
+                
+                left = self.evaluate(left)
+
+                if operator.token_type == TokenType.OR:
+
+                    if self._is_truthy(left):
+
+                        return left
+
+                else:
+
+                    if not self._is_truthy(left):
+
+                        return left
+
+                return self.evaluate(right)
+
             case Conditional(condition, then_branch, else_branch):
 
                 condition = self.evaluate(condition)
@@ -199,6 +217,14 @@ class Interpreter:
                 self._environment.define(name.lexeme, value)
                 
                 return None
+            
+            case While(condition, body):
+
+                while (self._is_truthy(self.evaluate(condition))):
+
+                    self._execute(body)
+
+                return None
 
             case Block(statements):
 
@@ -216,7 +242,7 @@ class Interpreter:
                     self._execute(else_branch)
 
                 return None
-
+        
     def execute_block(self, statements, environment):
 
         previous = self._environment
