@@ -13,7 +13,8 @@ class Scanner:
         self._current = 0
         self._line = 1
         self._keywords = {}
-    
+        
+        self._keywords["break"] = TokenType.BREAK
         self._keywords["and"] = TokenType.AND
         self._keywords["class"] = TokenType.CLASS
         self._keywords["else"] = TokenType.ELSE

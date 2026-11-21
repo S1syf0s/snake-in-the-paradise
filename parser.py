@@ -53,6 +53,10 @@ class Parser:
             return None
 
     def _statement(self):
+        
+        if self._match(TokenType.BREAK):
+
+            return self._brake_statement()
 
         if self._match(TokenType.FOR):
 
@@ -75,6 +79,14 @@ class Parser:
             return Block(self._block())
 
         return self._expression_statement()
+    
+    def _brake_statement(self):
+
+        keyword = self._previous()
+
+        self._consume(TokenType.SEMICOLON, "Expect ';' after 'brake'")
+
+        return Break(keyword)
 
     def _for_statement(self):
 

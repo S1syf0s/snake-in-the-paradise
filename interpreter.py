@@ -7,6 +7,9 @@ from environment import Environment
 
 import __main__
 
+class BreakException(Exception):
+    pass
+
 class Interpreter:
     
     def __init__(self):
@@ -196,6 +199,10 @@ class Interpreter:
     def _execute(self, stmt: Stmt):
 
         match stmt:
+            
+            case Break(keyword):
+
+                raise BreakException()
 
             case Expression(expression):
 
@@ -219,10 +226,14 @@ class Interpreter:
                 return None
             
             case While(condition, body):
+                
+                try:
+                    while (self._is_truthy(self.evaluate(condition))):
 
-                while (self._is_truthy(self.evaluate(condition))):
-
-                    self._execute(body)
+                        self._execute(body)
+                
+                except BreakException:
+                    return None 
 
                 return None
 

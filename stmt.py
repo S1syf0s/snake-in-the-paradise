@@ -32,3 +32,7 @@ class While(Stmt):
     condition: Expr
     body: Stmt
 
+@dataclass
+class Break(Stmt):
+    keyword: Token
+
